@@ -1,11 +1,15 @@
 package com.example.lecture.gingerkiva
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.View
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
+import com.example.lecture.gingerkiva.models.LoanResponse
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_kiva_detail.*
 import org.json.JSONObject
 import java.util.logging.Level
@@ -13,6 +17,8 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 
 class KivaDetail : AppCompatActivity() {
+
+    lateinit var loanObject: LoanResponse
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,23 +34,13 @@ class KivaDetail : AppCompatActivity() {
         val stringRequest = StringRequest(Request.Method.GET, url,
                 Response.Listener<String> { response ->
 
-                    val jsonResponse =  JSONObject(response)
+                    val gson = Gson()
 
-                    val loans = jsonResponse.getJSONArray("loans")
+                    loanObject = gson?.fromJson(response,LoanResponse::class.java)
 
-                    val loan = loans.getJSONObject(0);
+                    myLabel.text = loanObject.loans!![0].name
 
-                    var lable = loan.getString("name")
-
-                    lable += "\n "+loan.getString("status")
-
-                    lable += "\n "+loan.getString("activity")
-
-                    lable += "\n "+ loan.getString("sector")
-
-                    myLabel.text = lable
-
-                    Logger.getAnonymousLogger().log(Level.INFO,response)
+                    //Logger.getAnonymousLogger().log(Level.INFO,response)
 
 
                 },
@@ -54,6 +50,18 @@ class KivaDetail : AppCompatActivity() {
 
 // Add the request to the RequestQueue.
         queue.add(stringRequest)
+
+    }
+
+    fun onButtonClick(view: View){
+        val intent = Intent(this,DetalleActivity::class.java)
+
+        intent.putExtra("name",loanObject.loans!![0].name)
+        intent.putExtra("activity",loanObject.loans!![0].activity)
+        intent.putExtra("sector",loanObject.loans!![0].sector)
+
+        startActivity(intent)
+
 
     }
 }
