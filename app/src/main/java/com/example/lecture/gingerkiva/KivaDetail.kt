@@ -1,5 +1,6 @@
 package com.example.lecture.gingerkiva
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -53,15 +54,27 @@ class KivaDetail : AppCompatActivity() {
 
     }
 
-    fun onButtonClick(view: View){
-        val intent = Intent(this,DetalleActivity::class.java)
+    fun onButtonClick(view: View) {
+        val intent = Intent(this, DetalleActivity::class.java)
 
-        intent.putExtra("name",loanObject.loans!![0].name)
-        intent.putExtra("activity",loanObject.loans!![0].activity)
-        intent.putExtra("sector",loanObject.loans!![0].sector)
+        intent.putExtra("name", loanObject.loans!![0].name)
+        intent.putExtra("activity", loanObject.loans!![0].activity)
+        intent.putExtra("sector", loanObject.loans!![0].sector)
 
-        startActivity(intent)
-
+        startActivityForResult(intent, 33)
 
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == 33){
+            if(resultCode == Activity.RESULT_OK){
+                var opcion = data?.getStringExtra("resultado")
+                myLabel.text = opcion
+            }else{
+                myLabel.text = loanObject.loans!![0].name
+            }
+        }
+    }
+
+
 }
